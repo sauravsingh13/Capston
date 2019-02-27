@@ -7,7 +7,7 @@ import {
   withRouter
 } from "react-router-dom";
 import './App.css';
-import 'bootstrap/dist/css/bootstrap.css';
+import Navbar from './Component/Navbar/navbar';
 import Login from './Component/Login/Login';
 import Admin from './Component/Admin/Admin';
 import User from './Component/User/User';
@@ -68,18 +68,19 @@ class App extends Component {
   
   render() {
     return (      
-      <div className="App">
-        <Router>
+      <Router>
+        <div className="App">
+          <Navbar />
           <div>
-          <AuthButton />
-            <Route exact path="/login" component={Login}/>
-            {/* <Route path="/admin" component={Admin}/> */}
-            <PrivateRoute path="/admin" {...this.props} component={Admin} />
-            <Route path='/user' component={User}/>
-            <Route path='/register' component={Registration}/>
+            <AuthButton />
+              <Route exact path="/login" component={Login}/>
+              {/* <Route path="/admin" component={Admin}/> */}
+              <PrivateRoute path="/admin" {...this.props} component={Admin} />
+              <Route path='/user' component={User}/>
+              <Route path='/register' component={Registration}/>
           </div>
-        </Router>
-      </div>
+        </div>
+      </Router>
     );
   }
 }

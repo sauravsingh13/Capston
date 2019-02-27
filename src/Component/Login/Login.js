@@ -1,10 +1,10 @@
 import React from 'react';
-import { InputGroup, Input } from 'reactstrap';
-import { TabContent, TabPane, Nav, NavItem, NavLink, Button, Row, Col,Container } from 'reactstrap';
-import classnames from 'classnames';
+
 import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { MsgBox } from '../Utility/MsgBox';
+import Aux from '../../Hoc/Auxs/Auxs'
+
 //Actions
 import { findUser, findAdmin } from '../../Store/action/login'; 
 
@@ -16,21 +16,22 @@ class Login extends React.Component {
             password: '',
             adUserName: '',
             adPassword: '',
-            activeTab: '1'
+            userClass:"nav-item nav-link active",
+            adminClass:"nav-item nav-link",
+            admin:false,
         };
-        this.toggle = this.toggle.bind(this);
         this.user = this.user.bind(this);
         this.register = this.register.bind(this);
         this.admin = this.admin.bind(this);
     }
-    
-    toggle(tab) {
-        if (this.state.activeTab !== tab) {
-          this.setState({
-            activeTab: tab
-          });
-        }
+    adminTab=()=>{
+        this.setState({adminClass:"nav-item nav-link active",
+        userClass:"nav-item nav-link",admin:true})
     }
+    userTab=()=>{
+      this.setState({adminClass:"nav-item nav-link",
+      userClass:"nav-item nav-link active",admin:false})    }
+    
     handleUserInput(e){
         const name = e.target.name;
         const value = e.target.value;
@@ -56,85 +57,71 @@ class Login extends React.Component {
             type: "Warning",
             className: "alert alert-warning"
         }
-        //console.log("in render()", this.props)
-        const style = {
-            marginTop: '10%'
-          };
-        const styleCursor = {
-            cursor: 'pointer'
-        }
         if (this.props.user.hasOwnProperty("adminAccess") &&  this.props.user.adminAccess === true) {
             return <Redirect to='/admin' />
         }
         if (this.props.user.userAccess === true) {
             return <Redirect to='/user' />
         }
+        const style = {
+            
+            marginTop:"20px"
+        }
+        const tab = {
+            cursor:"pointer"
+        }
+        let adminUserToggle=null;
+        if(!this.state.admin){
+            adminUserToggle = (<Aux>
+                <div className="offset-md-4 col-md-4 ">
+            <input style={style} type="text" placeholder="User Name" 
+             onChange={ (event) => this.handleUserInput(event)} name="username"className="form-control"/>
+            </div>
+            <div className="offset-md-4 col-md-4 ">
+            <input  style={style} type="password" placeholder="Password" 
+            name="password" className="form-control" onChange={ (event) => this.handleUserInput(event)} /><br/>
+            <button type="button" style={{margin:"20px"}} onClick={this.register}  className="btn btn-primary">Register</button>
+            <button type="button" style={{margin:"20px"}} onClick={this.user} className="btn btn-success">Login</button>
+            { this.props.user.login  === "Failed" ?
+                            <MsgBox {..._props}></MsgBox>
+                        : null }
+            </div>
+            </Aux>  )
+        }
+        else{
+            adminUserToggle = (<Aux>
+                <div className="offset-md-4 col-md-4 ">
+            <input style={style} type="text" placeholder="Admin Name" 
+            name="adUserName" onChange={ (event) => this.handleUserInput(event)}className="form-control"/>
+            </div>
+            <div className="offset-md-4 col-md-4 ">
+            <input  style={style} type="password" placeholder="Password" 
+            name="adPassword" onChange={ (event) => this.handleUserInput(event)} className="form-control" /><br/>
+            <button type="button" style={style}  onClick={this.admin} className="btn btn-primary">Secure Login</button>
+            { this.props.user.login === "Failed" ?
+                            <MsgBox {..._props}></MsgBox>
+                        : null }
+            </div>
+            </Aux>  )
+        }
         return(
-            <Container style={style}>
-            <Row>
-                <Col sm="12" md={{ size: 6, offset: 3 }}>
-                    <Nav tabs>
-                        <NavItem>
-                            <NavLink
-                            className={classnames({ active: this.state.activeTab === '1' })}
-                            onClick={() => { this.toggle('1'); }} style={styleCursor}
-                            >
-                                USER
-                            </NavLink>
-                        </NavItem>
-                        <NavItem>
-                            <NavLink
-                            className={classnames({ active: this.state.activeTab === '2' })}
-                            onClick={() => { this.toggle('2'); }} style={styleCursor}
-                            >
-                                ADMIN
-                            </NavLink>
-                        </NavItem>
-                    </Nav>
-                </Col>
-            </Row><br/>
-               <TabContent activeTab={this.state.activeTab}>
-                   <TabPane tabId="1">
-                        <Row>
-                            <Col sm="12" md={{ size: 6, offset: 3 }}><InputGroup>
-                                <Input type="text" placeholder="username" name="username" onChange={ (event) => this.handleUserInput(event)} />
-                                </InputGroup>
-                            </Col>
-                        </Row><br/>
-                        <Row>
-                            <Col sm="12" md={{ size: 6, offset: 3 }}><InputGroup>
-                                <Input type="password" placeholder="password"  name="password" onChange={ (event) => this.handleUserInput(event)}/>
-                                </InputGroup>
-                            </Col>
-                        </Row><br/>
-                        <Button className="mrg10" color="primary" onClick={this.register}>Register</Button>    
-                        <Button className="mrg10" color="success" onClick={this.user}>Sign In</Button>
-                        { this.props.user.login  === "Failed" ?
-                            <MsgBox {..._props}></MsgBox>
-                        : null }
-                    </TabPane>
-                   <TabPane tabId="2">
-                   <Row>
-                    <Col sm="12" md={{ size: 6, offset: 3 }}><InputGroup>
-                        <Input placeholder="admin name" name="adUserName" onChange={ (event) => this.handleUserInput(event)}/>
-                        </InputGroup>
-                    </Col>
-                    </Row><br/>
-                    <Row>
-                        <Col sm="12" md={{ size: 6, offset: 3 }}><InputGroup>
-                            <Input type="password" placeholder="Password" name="adPassword" onChange={ (event) => this.handleUserInput(event)}/>
-                            </InputGroup>
-                        </Col>
-                    </Row><br/>
-                        <Button color="primary" onClick={this.admin}>Admin Login</Button>
-                        { this.props.user.login === "Failed" ?
-                            <MsgBox {..._props}></MsgBox>
-                        : null }
-                   </TabPane>
-               </TabContent>
-           
-            </Container>
+            <Aux>
+                <div className="row">
+                <div className="offset-md-4 col-md-4 ">
+                    <nav  style={style}>
+                        <div className="nav nav-tabs">
+                            <span className={this.state.userClass} style={tab} onClick={this.userTab}>User</span>
+                            <span className={this.state.adminClass} style={tab} onClick={this.adminTab}>Admin</span>
+                        </div>
+                    </nav>               
+                </div>
+                </div>
+                <div className="row">
+                {adminUserToggle}
+                </div>
+            </Aux>
         )
+        
     }
 }
 

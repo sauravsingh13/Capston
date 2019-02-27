@@ -15,6 +15,9 @@ mongoose.connect('mongodb://localhost:27017/bookmybus', { useNewUrlParser: true 
 //var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/user');
 var registerRouter = require('./routes/registration');
+var cityRouter = require('./routes/cities')
+var busRouter = require('./routes/busses')
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -27,10 +30,23 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, 'build')));
-
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PATCH, DELETE, OPTIONS, PUT"
+  );
+  next();
+});
 //app.use('/', indexRouter);
 app.use('/login', usersRouter);
 app.use('/register', registerRouter);
+app.use('/city',cityRouter)
+app.use('/bus',busRouter)
 
 app.get("*", function(req, res, next){
   res.sendFile(path.join(__dirname, 'build/index.html'))  

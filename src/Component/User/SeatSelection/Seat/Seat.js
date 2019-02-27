@@ -4,20 +4,24 @@ import './Seat.css'
 
 class Seat extends Component{
     state={
-        classSeatStatus:this.props.rowstatus,
+        classSeatStatus:this.props.rowstatus.slice(),
     }
     bookTicket=(i)=>{
-        let status=this.state.classSeatStatus;
+        let status=this.state.classSeatStatus.slice();
+        console.log(status)
         if(status[i]==='booking'){
             status[i]='unbooked';
+            this.props.booking(this.props.children+(i+1))
+
         }
         else{
-            if(status[i]!=='booked')
+            if(status[i]==='unbooked')
             status[i]='booking';
+            this.props.booking(this.props.children+(i+1))
+
         }
         
         this.setState({classSeatStatus:status})
-        this.props.booking(this.props.children+(i+1))
     }
     
     render(){

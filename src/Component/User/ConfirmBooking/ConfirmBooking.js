@@ -1,6 +1,5 @@
 import React from 'react'
 import './ConfirmBooking.css'
-import { Button } from 'reactstrap';
 
 
 const confirmBooking=(props)=>{
@@ -10,8 +9,8 @@ const confirmBooking=(props)=>{
         <div className="ConfirmBooking">
         Seat Booked:<br/>
         {seatBooked}<br/>
-        <Button color="warning" onClick={props.cancel}>Cancel</Button><br/><br/>
-        <Button color="success" onClick={props.proceedToPayment}>Proceed To Payment</Button>
+        <input type="button" color="warning" onClick={props.cancel}>Cancel</input><br/><br/>
+        <input type="button" color="success" onClick={props.proceedToPayment}>Proceed To Payment</input>
     </div>
     )
     

@@ -1,25 +1,38 @@
 import React from 'react'
 import './Bus.css'
-import { Card, CardText, CardBody,
-    CardTitle,  Button } from 'reactstrap';
+import Aux from '../../../../Hoc/Auxs/Auxs'
 
-const bus = (props) =>(
-<Card className="bus">
-        <CardBody>
-        <div className="bus_left">
-          <CardTitle className="CardTitle">{props.busName}</CardTitle>
-          <CardText style={{marginBottom:'0%'}}>{props.busDescription}</CardText>
-         
-          </div>
-            <div className="bus_center">
-          <p style={{marginBottom:'0%'}}>{props.sourceTime} &rarr; {props.destinationTime}</p>
-            </div>
-          <div className="bus_right">
-          <p style={{marginBottom:'0%'}}>Price=₹{props.price}</p>
-          <Button color="success" onClick={()=>props.book(props.busName)}>Book Now</Button>
-          </div>
-        </CardBody>
-    </Card>
-)
+
+const bus = (props) =>{
+  console.log(props)
+  const style = {
+    fontWeight:"normal",
+    fontSize:"25px",
+    margin:"auto"
+  }
+  return(
+    <Aux>
+    <div className="row bus">
+      <div className="col-md-3"><p className="BusDetail">{props.busName}</p><p>{props.busDescription}</p></div>
+      <div className="col-md-3 " style={{margin:"auto"}}>
+        <p style={style}>{props.sourceTime}</p>
+        <p>{props.source}</p>
+      </div><div className="col-md-2" style={{margin:"auto"}}>
+        <p style={style}>{props.destinationTime}</p>
+        <p>{props.destination}</p>
+      </div><div className="col-md-2" style={{margin:"auto"}}>
+      {props.duration} hrs
+      </div><div className="col-md-2 " style={{margin:"auto"}}>
+      <p>₹ {props.price}</p>
+      <button type="button" className="btn btn-success" onClick={props.book}>Book Now</button>
+      </div>
+    </div>
+    
+  </Aux>
+  )
+}
+
+
+
 
 export default bus;

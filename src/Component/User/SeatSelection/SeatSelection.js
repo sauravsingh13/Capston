@@ -21,7 +21,7 @@ class seatSelection extends Component{
         seatBooking:[],
     }
     seatBookingArray=(seat)=>{
-        let seatBooked=this.state.seatBooking;
+        let seatBooked=this.state.seatBooking.slice();
         if(!seatBooked.includes(seat)){
             seatBooked.push(seat)
         }

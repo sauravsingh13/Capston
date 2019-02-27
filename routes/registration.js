@@ -5,6 +5,7 @@ var usersCOLL = require("../Schemas/userSchema");
 
 
 router.post('/addUsers', function(req, res, next) {
+    console.log('sddcdc')
     var newUser = new usersCOLL();
     newUser.firstname = req.body.firstname;
     newUser.lastname = req.body.lastname;
