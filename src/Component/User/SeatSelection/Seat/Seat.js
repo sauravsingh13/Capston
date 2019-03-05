@@ -8,16 +8,18 @@ class Seat extends Component{
     }
     bookTicket=(i)=>{
         let status=this.state.classSeatStatus.slice();
-        console.log(status)
         if(status[i]==='booking'){
             status[i]='unbooked';
             this.props.booking(this.props.children+(i+1))
-
         }
         else{
+
             if(status[i]==='unbooked')
-            status[i]='booking';
+            {
+                status[i]='booking';
             this.props.booking(this.props.children+(i+1))
+            }
+            
 
         }
         

@@ -1,12 +1,12 @@
 import React from 'react';
-
+import axios from 'axios';
 import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { MsgBox } from '../Utility/MsgBox';
 import Aux from '../../Hoc/Auxs/Auxs'
 
 //Actions
-import { findUser, findAdmin } from '../../Store/action/login'; 
+import { findUser, findAdmin, clearUser } from '../../Store/action/login'; 
 
 class Login extends React.Component {
     constructor(props) {
@@ -47,9 +47,14 @@ class Login extends React.Component {
         this.props.checkUser({"username": username, "password": password});
         //this.setState({userAccess:true});
     }
+    
     register(){
-        console.log("registration");
         this.props.history.push('/register');
+    }
+
+    componentWillMount(){
+        console.log("login===>")
+      //  this.props.logoutUser();
     }
     render(){
         const _props = {
@@ -82,6 +87,8 @@ class Login extends React.Component {
             name="password" className="form-control" onChange={ (event) => this.handleUserInput(event)} /><br/>
             <button type="button" style={{margin:"20px"}} onClick={this.register}  className="btn btn-primary">Register</button>
             <button type="button" style={{margin:"20px"}} onClick={this.user} className="btn btn-success">Login</button>
+            <button type="button" style={{margin:"20px"}} className="btn btn-success">
+            <a href="/login/google">Google+</a></button>
             { this.props.user.login  === "Failed" ?
                             <MsgBox {..._props}></MsgBox>
                         : null }
@@ -135,7 +142,10 @@ const mapDispatchToProps = dispatch => {
       },
       checkAdmin: admin => {
           dispatch(findAdmin(admin));
-      }
+      },
+      logoutUser: () => {
+        dispatch(clearUser());
+      },
     };
 };
 

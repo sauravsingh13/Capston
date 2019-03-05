@@ -6,6 +6,7 @@ import {
   Redirect,
   withRouter
 } from "react-router-dom";
+import axios from 'axios';
 import './App.css';
 import Navbar from './Component/Navbar/navbar';
 import Login from './Component/Login/Login';
@@ -13,6 +14,8 @@ import Admin from './Component/Admin/Admin';
 import User from './Component/User/User';
 import Registration from './Component/Register/Registration'
 import { MsgBox } from './Component/Utility/MsgBox';
+//Actions
+import { getUser, loginUser } from './Store/action/login';
 
 const fakeAuth = {
   isAuthenticated: false,
@@ -47,7 +50,9 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
     {...rest}
     render={ props =>{
       return (
-        rest.user.hasOwnProperty('admin') && rest.user.adminAccess ? (
+        //rest.user.hasOwnProperty('admin') && rest.user.adminAccess ? (
+        //rest.auth.hasOwnProperty('user') && rest.auth.user.length > 0 ? (
+        true ? (
           <Component {...props} />
         ) : (
           <Redirect
@@ -65,18 +70,32 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
 );
 
 class App extends Component {
-  
+  constructor(props){
+    super(props);
+  }
+  componentWillMount(){
+    const searchParams = window.location.search;
+    if(searchParams.indexOf('?token=') != -1 && searchParams.split('?token=')[1]){
+      axios.get("/login/authUser", {
+        params: {token: searchParams.split('?token=')[1]}
+      })
+      .then(response => {
+          this.props.dispatch(loginUser(response.data));
+      })
+      .catch(error => {
+          throw(error);
+      });
+    }
+  }
   render() {
-    return (      
+    return (
       <Router>
         <div className="App">
           <Navbar />
           <div>
-            <AuthButton />
               <Route exact path="/login" component={Login}/>
-              {/* <Route path="/admin" component={Admin}/> */}
               <PrivateRoute path="/admin" {...this.props} component={Admin} />
-              <Route path='/user' component={User}/>
+              <PrivateRoute path='/user' {...this.props} component={User}/>
               <Route path='/register' component={Registration}/>
           </div>
         </div>
@@ -86,7 +105,7 @@ class App extends Component {
 }
 
 const mapStateToProps = (state) => ({
-  "user" : state.user 
+  "auth" : state.user
 });
 
 export default connect(mapStateToProps, null)(App);

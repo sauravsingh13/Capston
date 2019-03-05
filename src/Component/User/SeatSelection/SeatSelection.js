@@ -25,6 +25,9 @@ class seatSelection extends Component{
         if(!seatBooked.includes(seat)){
             seatBooked.push(seat)
         }
+        else{
+            seatBooked=seatBooked.filter((i)=>i!==seat)
+        }
         this.setState({seatBooking:seatBooked})
     }
     

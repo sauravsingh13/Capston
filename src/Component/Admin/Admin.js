@@ -9,6 +9,8 @@ import './Admin.css'
 import ViewCities from './Cities/ViewCities/ViewCities'
 import UpdateCity from './Cities/UpdateCity/UpdateCity'
 import UpdateBus from './Busses/UpdateBus/UpdateBus'
+import SeatBooked from './Busses/ViewBusses/SeatBooked/SeatBooked'
+import Backdrop from '../Utility/Backdrop/Backdrop'
 
 export default class Admin extends React.Component {
     state={
@@ -16,7 +18,9 @@ export default class Admin extends React.Component {
         display:'menu',
         cities:[],
         updateCity:null,
-        updateBus:null
+        updateBus:null,
+        showSeat:false,
+        bus:{}
     }
     
     
@@ -48,15 +52,64 @@ export default class Admin extends React.Component {
 			.catch(error => {throw error});
     }
     deleteBus=(id)=>{
-        axios.delete('http://localhost:8080/bus/delete/' + id)
-         .then(response=>{this.viewBusses()});
+        let busses = this.state.busses;
+        let bus = busses.find((bus) => bus._id === id);
+        let showSeat = false
+        for(let i=0;i<bus.seatStatus.length;i++){
+            if(bus.seatStatus[i].status.includes('booked'))
+            {
+                showSeat = true;
+                    break;
+            }
+        }
+        if(showSeat)
+        this.setState({bus:bus,showSeat:true})
+        else{
+            axios.delete('http://localhost:8080/bus/delete/' + id)
+            .then(response=>{this.viewBusses()});
+        }
     }
     updateBus = (id) => {
         let busses = this.state.busses;
-        let bus = busses.find((bus) => bus._id === id)
+        let bus = busses.find((bus) => bus._id === id);
+        let showSeat = false;
+        for(let i=0;i<bus.seatStatus.length;i++){
+            if(bus.seatStatus[i].status.includes('booked'))
+            {
+                showSeat = true
+                    break;
+            }
+        }
+        if(showSeat)
+        this.setState({bus:bus,showSeat:true})
+        else{
         this.setState({updateBus:bus})
         this.navigateTo('updateBus')
+        }
 
+    }
+    viewBusListBooked = () => {
+        axios.get('http://localhost:8080/bus/viewBus')
+            .then(response => {
+                let busses = response.data.busses;
+                busses = busses.filter((bus)=>{
+                    let showSeat = false;
+                    for(let i=0;i<bus.seatStatus.length;i++){
+                        if(bus.seatStatus[i].status.includes('booked'))
+                        {
+                            showSeat = true
+                                break;
+                        }
+                    }
+                    return showSeat;
+                })
+                this.setState({busses:busses})
+                
+            })
+			.catch(error => {throw error});
+    }
+    cancelSeatView=()=>{
+        this.setState({showSeat:false})
     }
     navigateTo=(display)=>{
         if(display=='viewCity'){
@@ -64,6 +117,9 @@ export default class Admin extends React.Component {
         }
         if(display=='viewBusList'){
             this.viewBusses();
+        }
+        if(display=='viewBusListBooked'){
+            this.viewBusListBooked();
         }
         this.setState({display:display})
     }
@@ -74,7 +130,7 @@ export default class Admin extends React.Component {
                 view=(<Aux>
                     <AdminNavigation clicked={()=>this.navigateTo('viewBusList')}>View Bus List</AdminNavigation><br/>
                 <AdminNavigation clicked={()=>this.navigateTo('addBus')}>Add Bus</AdminNavigation><br/>
-                {/* <AdminNavigation clicked={()=>this.navigateTo()}>View list of buses booked</AdminNavigation><br/> */}
+                <AdminNavigation clicked={()=>this.navigateTo('viewBusListBooked')}>View list of buses booked</AdminNavigation><br/>
                 <AdminNavigation clicked={()=>this.navigateTo('viewCity')}>View Cities</AdminNavigation><br/>
                 <AdminNavigation clicked={()=>this.navigateTo('addCity')}>Add City</AdminNavigation><br/>
                 <AdminNavigation clicked={()=>this.navigateTo()}>Chart - Top destination cities</AdminNavigation>
@@ -116,6 +172,8 @@ export default class Admin extends React.Component {
             case 'viewBusList':
                     view=(
                         <Aux>
+                        <Backdrop show={this.state.showSeat} ><SeatBooked cancel={this.cancelSeatView}
+                        seatStatus={this.state.bus.seatStatus} /></Backdrop>
                         <input type='button' onClick={()=>this.navigateTo('menu')} className="BackToMenu" value="<- Back To Menu"  />
                         <ViewBusses busses={this.state.busses} delete={this.deleteBus} update={this.updateBus}/>                            
                         </Aux>
@@ -126,6 +184,16 @@ export default class Admin extends React.Component {
                         <Aux>
                          <input type='button' onClick={()=>this.navigateTo('menu')} className="BackToMenu" value="<- Back To Menu"  /> 
                         <UpdateBus update={this.state.updateBus}/>
+                        </Aux>
+                    )
+                    break;
+            case 'viewBusListBooked':
+                    view=(
+                        <Aux>
+                        <Backdrop show={this.state.showSeat} ><SeatBooked cancel={this.cancelSeatView}
+                        seatStatus={this.state.bus.seatStatus} /></Backdrop>
+                        <input type='button' onClick={()=>this.navigateTo('menu')} className="BackToMenu" value="<- Back To Menu"  /> 
+                        <ViewBusses busses={this.state.busses}  delete={this.deleteBus} update={this.updateBus}/>                            
                         </Aux>
                     )
                     break;

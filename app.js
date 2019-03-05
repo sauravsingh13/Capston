@@ -1,12 +1,15 @@
 var express = require('express');
 var path = require('path');
 var mongoose = require('mongoose');
+var passport = require('passport');
 var favicon = require('serve-favicon');
 var cookieParser = require('cookie-parser');
+var cookieSession = require('cookie-session');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
+var keys = require('./config/keys');
 var http = require('http');
-
+var passportSetup = require('./config/passport.setup');
 var app = express();
 
 mongoose.Promise = global.Promise;
@@ -17,11 +20,21 @@ var usersRouter = require('./routes/user');
 var registerRouter = require('./routes/registration');
 var cityRouter = require('./routes/cities')
 var busRouter = require('./routes/busses')
-
+var oAuthUserRouter = require('./routes/oAuthUsers');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'html');
+
+// Session Maintanance here
+app.use(cookieSession({
+  maxAge: 24 * 60 * 60 * 1000,
+  keys: [keys.session.cookieKey] 
+}));
+
+// initialize passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
@@ -43,6 +56,7 @@ app.use((req, res, next) => {
   next();
 });
 //app.use('/', indexRouter);
+app.use('/auth', oAuthUserRouter);
 app.use('/login', usersRouter);
 app.use('/register', registerRouter);
 app.use('/city',cityRouter)

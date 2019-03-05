@@ -1,14 +1,20 @@
-import React from 'react'
+import React, { Component } from 'react'
 import './User.css'
 import axios from 'axios';
+import { connect } from 'react-redux';
+import { Redirect } from "react-router-dom";
 import Busses from './Busses/Busses'
 import Search from './Search/Search'
 import SeatSelection from './SeatSelection/SeatSelection'
-import Backdrop from './Backdrop/Backdrop'
+import Backdrop from '../Utility/Backdrop/Backdrop'
 import ConfirmBooking from './ConfirmBooking/ConfirmBooking'
+//Actions
+import { loginUser } from '../../Store/action/login';
 
-export default class User extends React.Component {
-    state={
+class User extends Component {
+  constructor(props){
+    super(props);
+    this.state={
       busses:[],
       bus:[],
       seatStatus:[],
@@ -17,19 +23,34 @@ export default class User extends React.Component {
       seatBooked:[],
       busId:null
     }
-    componentDidMount(){
-      axios.get('http://localhost:8080/bus/viewBus')
-            .then(response => {
-                const busses = response.data.busses;
-                this.setState({busses:busses})
-                
-            })
-			.catch(error => {throw error});
+  }
+    
+  componentDidMount(){
+      // const searchParams = this.props.location.search;
+      // console.log("nextProps===>", this.props)
+      // if(searchParams.indexOf('?token=') != -1 && searchParams.split('?token=')[1]){
+      //   axios.get("/login/authUser", {
+      //     params: {token: searchParams.split('?token=')[1]}
+      //   })
+      //   .then(response => {
+      //       this.props.dispatch(loginUser(response.data));
+      //   })
+      //   .catch(error => {
+      //       throw(error);
+      //   });
+        //nextProps.getUser({token: searchParams.split('?token=')[1]});
+        axios.get('http://localhost:8080/bus/viewBus')
+          .then(response => {
+              const busses = response.data.busses;
+              this.setState({busses:busses})
+          })
+          .catch(error => {throw error});
+      //}
     }
     searchBuses=(source,destination,date)=>{
       console.log(source,destination,date)
      let bus=this.state.busses.filter((bus)=>
-        source===bus.fromCity  && destination===bus.toCity
+     source.toLowerCase()===bus.fromCity.toLowerCase()  && destination.toLowerCase()===bus.toCity.toLowerCase()
       )
       this.setState({bus:bus})
     }
@@ -88,8 +109,10 @@ export default class User extends React.Component {
       alert('PAYMENT SUCCESSFILL')
     }
     render(){
-       
-        
+        console.log("=====>", this.props)
+        // if(this.props.auth.user.length == 0 ){
+        //   return <Redirect to="/login"/>
+        // }
         return(
              <div>
                 <Backdrop show={this.state.SeatSelection} ><SeatSelection cancel={this.cancelBooking}
@@ -113,3 +136,9 @@ export default class User extends React.Component {
         )
     }
 }
+
+
+const mapStateToProps = (state) => ({
+  "auth" : state.user 
+});
+export default connect(mapStateToProps, null)(User);

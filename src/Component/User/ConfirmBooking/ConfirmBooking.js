@@ -9,8 +9,10 @@ const confirmBooking=(props)=>{
         <div className="ConfirmBooking">
         Seat Booked:<br/>
         {seatBooked}<br/>
-        <input type="button" color="warning" onClick={props.cancel}>Cancel</input><br/><br/>
-        <input type="button" color="success" onClick={props.proceedToPayment}>Proceed To Payment</input>
+        {/* <input type="button" color="warning" onClick={props.cancel}>Cancel</input><br/><br/>
+        <input type="button" color="success" onClick={props.proceedToPayment}>Proceed To Payment</input> */}
+        <button  className="btn btn-warning" onClick={props.cancel}>Cancel</button><br/><br/>
+        <button   className="btn btn-success" onClick={props.proceedToPayment}>Proceed To Payment</button>
     </div>
     )
     

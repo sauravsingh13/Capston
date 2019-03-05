@@ -8,12 +8,35 @@ export const loginUser = (user) => {
     }
 };
 
+export const logoutUser = () => {
+    return {
+      type: 'LOGOUT_USER',
+      payload: {}
+    }
+};
+
 export const loginAdmin = (admin) => {
     return {
       type: 'LOGIN_ADMIN',
       payload: admin
     }
 };
+
+//Get User when login
+export const getUser = (payload) => {
+    return (dispatch) => {
+        return axios.get("/login/authUser", {
+            params: payload
+        })
+        .then(response => {
+            dispatch(loginUser(response.data));
+        })
+        .catch(error => {
+            throw(error);
+        });
+    }
+}
+
 //Find User when login
 export const findUser = (credential) => {
     return (dispatch) => {
@@ -27,6 +50,12 @@ export const findUser = (credential) => {
         .catch(error => {
             throw(error);
         });
+    }
+}
+
+export const clearUser = () => {
+    return (dispatch) => {
+        dispatch(logoutUser());
     }
 }
 
